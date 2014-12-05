@@ -25,25 +25,29 @@ public class BiomeView {
 	private Color red;
 	private Color green;
 	private IViewListener listener;
+	private int sizeX;
+	private int sizeY;
 
 	public BiomeView(Shell shell, final int sizeX, final int sizeY) {
+		this.sizeX = sizeX;
+		this.sizeY = sizeY;
 		this.red = shell.getDisplay().getSystemColor(SWT.COLOR_RED);
 		this.green = shell.getDisplay().getSystemColor(SWT.COLOR_GREEN);
 
-		createTable(shell, sizeX, sizeY);
+		createTable(shell);
 		createTickButton(shell);
 	}
 
-	private void createTable(Shell shell, final int sizeX, final int sizeY) {
+	private void createTable(Shell shell) {
 		table = new Table(shell, SWT.BORDER | SWT.NO_SCROLL
 				| SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
 		table.setLinesVisible(true);
 
 		for (int x = 0; x < sizeX; x++) {
-			new TableColumn(table, SWT.NONE);
+			new TableColumn(table, SWT.CENTER);
 		}
 		for (int y = 0; y < sizeY; y++) {
-			new TableItem(table, SWT.NONE);
+			new TableItem(table, SWT.CENTER);
 		}
 		for (int x = 0; x < sizeX; x++) {
 			table.getColumn(x).pack();
@@ -54,22 +58,29 @@ public class BiomeView {
 			public void handleEvent(Event event) {
 				Point pt = new Point(event.x, event.y);
 				TableItem clickedItem = table.getItem(pt);
-				int x = -1;
 				if (clickedItem != null) {
-					for (int i = 0; i < sizeX; i++) {
-						Rectangle rect = clickedItem.getBounds(i);
-						if (rect.contains(pt)) {
-							x = i;
-						}
-					}
+					int x = findClickedColumn(pt, clickedItem);
+
 					int y = Arrays.asList(table.getItems())
 							.indexOf(clickedItem);
+
 					if (x != -1) {
 						listener.itemClicked(x, y);
 					}
 				}
 			}
+
 		});
+	}
+
+	private int findClickedColumn(Point pt, TableItem clickedItem) {
+		for (int i = 0; i < sizeX; i++) {
+			Rectangle rect = clickedItem.getBounds(i);
+			if (rect.contains(pt)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	private void createTickButton(Shell shell) {
@@ -97,18 +108,13 @@ public class BiomeView {
 	}
 
 	public void update(Biome biome) {
-		for (int x = 0; x < biome.getSizeX(); x++) {
-			TableColumn column = new TableColumn(table, SWT.NONE);
-			column.setText(Integer.toString(x));
-		}
-		for (int y = 0; y < biome.getSizeY(); y++) {
-			for (int x = 0; x < biome.getSizeX(); x++) {
+		for (int y = 0; y < sizeY; y++) {
+			for (int x = 0; x < sizeX; x++) {
 				setCellStatus(x, y, biome.getStatus(x, y));
 			}
 		}
-		for (int x = 0; x < biome.getSizeX(); x++) {
-			table.getColumn(x).pack();
-		}
+
+		table.deselectAll();
 	}
 
 	public void setListener(IViewListener listener) {
