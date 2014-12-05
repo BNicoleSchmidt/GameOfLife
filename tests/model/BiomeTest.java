@@ -3,16 +3,23 @@ package model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class BiomeTest {
+
+	@Mock
+	private IBiomeListener biomeListener;
 
 	private Biome biome;
 
 	@Before
 	public void setUp() {
+		MockitoAnnotations.initMocks(this);
 		biome = new Biome(10, 10);
 	}
 
@@ -98,5 +105,23 @@ public class BiomeTest {
 		biome.setStatus(5, 5, true);
 		biome.toggleCell(5, 5);
 		assertFalse(biome.getStatus(5, 5));
+	}
+
+	@Test
+	public void testToggleCellNotifiesListener() {
+		biome.setListener(biomeListener);
+
+		biome.toggleCell(5, 5);
+
+		verify(biomeListener).biomeUpdated();
+	}
+
+	@Test
+	public void testTickNotifiesListener() {
+		biome.setListener(biomeListener);
+
+		biome.tick();
+
+		verify(biomeListener).biomeUpdated();
 	}
 }

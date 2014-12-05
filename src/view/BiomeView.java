@@ -5,11 +5,13 @@ import java.util.Arrays;
 import model.Biome;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -24,20 +26,24 @@ public class BiomeView {
 	private Color green;
 	private IViewListener listener;
 
-	public BiomeView(Display display) {
-		this.red = display.getSystemColor(SWT.COLOR_RED);
-		this.green = display.getSystemColor(SWT.COLOR_GREEN);
+	public BiomeView(Shell shell, final int sizeX, final int sizeY) {
+		this.red = shell.getDisplay().getSystemColor(SWT.COLOR_RED);
+		this.green = shell.getDisplay().getSystemColor(SWT.COLOR_GREEN);
+
+		createTable(shell, sizeX, sizeY);
+		createTickButton(shell);
 	}
 
-	public Table buildTable(final int sizeX, final int sizeY, Shell shell) {
+	private void createTable(Shell shell, final int sizeX, final int sizeY) {
 		table = new Table(shell, SWT.BORDER | SWT.NO_SCROLL
 				| SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
 		table.setLinesVisible(true);
+
 		for (int x = 0; x < sizeX; x++) {
-			TableColumn column = new TableColumn(table, SWT.NONE);
+			new TableColumn(table, SWT.NONE);
 		}
 		for (int y = 0; y < sizeY; y++) {
-			TableItem item = new TableItem(table, SWT.NONE);
+			new TableItem(table, SWT.NONE);
 		}
 		for (int x = 0; x < sizeX; x++) {
 			table.getColumn(x).pack();
@@ -53,20 +59,30 @@ public class BiomeView {
 					for (int i = 0; i < sizeX; i++) {
 						Rectangle rect = clickedItem.getBounds(i);
 						if (rect.contains(pt)) {
-							System.out.println("item clicked.");
-							System.out.println("x is " + i);
 							x = i;
 						}
 					}
 					int y = Arrays.asList(table.getItems())
 							.indexOf(clickedItem);
-					System.out.println("y is " + y);
-					listener.itemClicked(x, y);
+					if (x != -1) {
+						listener.itemClicked(x, y);
+					}
 				}
 			}
 		});
+	}
 
-		return table;
+	private void createTickButton(Shell shell) {
+		Button tickButton = new Button(shell, SWT.PUSH);
+		tickButton.setText("Tick");
+		tickButton.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, true,
+				1, 1));
+		tickButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				listener.tickClicked();
+			}
+		});
 	}
 
 	public void setCellStatus(int x, int y, boolean alive) {
@@ -80,21 +96,14 @@ public class BiomeView {
 		}
 	}
 
-	public void update(Biome biome, Table table, Display display) {
+	public void update(Biome biome) {
 		for (int x = 0; x < biome.getSizeX(); x++) {
 			TableColumn column = new TableColumn(table, SWT.NONE);
 			column.setText(Integer.toString(x));
 		}
 		for (int y = 0; y < biome.getSizeY(); y++) {
-			TableItem item = table.getItem(y);
 			for (int x = 0; x < biome.getSizeX(); x++) {
-				if (biome.getStatus(x, y)) {
-					item.setText(x, "1");
-					item.setBackground(x, green);
-				} else {
-					item.setText(x, "0");
-					item.setBackground(x, red);
-				}
+				setCellStatus(x, y, biome.getStatus(x, y));
 			}
 		}
 		for (int x = 0; x < biome.getSizeX(); x++) {

@@ -1,6 +1,7 @@
 package application;
 
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import model.Biome;
 import model.IBiomeListener;
@@ -59,6 +60,27 @@ public class PresenterTest {
 		verify(biome).setListener(biomeListenerCaptor.capture());
 		IBiomeListener biomeListener = biomeListenerCaptor.getValue();
 
+		verify(biomeView).update(biome);
+
 		biomeListener.biomeUpdated();
+
+		verify(biomeView, times(2)).update(biome);
 	}
+
+	@Test
+	public void testWhenTickClickedBiomeTicks() {
+		new Presenter(biome, biomeView);
+		verify(biomeView).setListener(viewListenerCaptor.capture());
+		IViewListener viewListener = viewListenerCaptor.getValue();
+		viewListener.tickClicked();
+		verify(biome).tick();
+	}
+
+	@Test
+	public void testTableIsUpdatedOnCreation() {
+		new Presenter(biome, biomeView);
+
+		verify(biomeView).update(biome);
+	}
+
 }

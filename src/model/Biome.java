@@ -21,7 +21,7 @@ public class Biome {
 			}
 		}
 		this.biome = nextBiome;
-		// listener
+		notifyListener();
 	}
 
 	private boolean getNextState(int x, int y) {
@@ -63,12 +63,19 @@ public class Biome {
 		return false;
 	}
 
-	public void setStatus(int x, int y, boolean status) {
+	protected void setStatus(int x, int y, boolean status) {
 		this.biome[x][y] = status;
 	}
 
 	public void toggleCell(int x, int y) {
 		setStatus(x, y, !getStatus(x, y));
+		notifyListener();
+	}
+
+	private void notifyListener() {
+		if (listener != null) {
+			listener.biomeUpdated();
+		}
 	}
 
 	public void setListener(IBiomeListener listener) {
