@@ -34,10 +34,12 @@ public class Biome {
 	}
 
 	public int countNeighbors(int x, int y) {
-		int alive = checkNeighbor(x - 1, y - 1) + checkNeighbor(x, y - 1)
-				+ checkNeighbor(x + 1, y - 1) + checkNeighbor(x - 1, y)
-				+ checkNeighbor(x + 1, y) + checkNeighbor(x - 1, y + 1)
-				+ checkNeighbor(x, y + 1) + checkNeighbor(x + 1, y + 1);
+		int alive = -checkNeighbor(x, y);
+		for (int xOffset = -1; xOffset <= 1; ++xOffset) {
+			for (int yOffset = -1; yOffset <= 1; ++yOffset) {
+				alive += checkNeighbor(x + xOffset, y + yOffset); 
+			}
+		}
 		return alive;
 	}
 
@@ -80,6 +82,10 @@ public class Biome {
 
 	public void setListener(IBiomeListener listener) {
 		this.listener = listener;
+	}
+
+	public boolean[][] getBiome() {
+		return this.biome;
 	}
 
 }

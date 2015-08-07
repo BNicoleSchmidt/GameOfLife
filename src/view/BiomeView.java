@@ -2,8 +2,6 @@ package view;
 
 import java.util.Arrays;
 
-import model.Biome;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -28,15 +26,18 @@ public class BiomeView {
 	private int sizeX;
 	private int sizeY;
 
-	public BiomeView(Shell shell, final int sizeX, final int sizeY) {
+	public BiomeView(Shell shell, int sizeX, int sizeY) {
 		this.sizeX = sizeX;
 		this.sizeY = sizeY;
 		this.red = shell.getDisplay().getSystemColor(SWT.COLOR_RED);
 		this.green = shell.getDisplay().getSystemColor(SWT.COLOR_GREEN);
+		
 
 		createTable(shell);
 		createTickButton(shell);
+		createTick5Button(shell);
 	}
+
 
 	private void createTable(Shell shell) {
 		table = new Table(shell, SWT.BORDER | SWT.NO_SCROLL
@@ -54,7 +55,11 @@ public class BiomeView {
 		}
 		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		table.addListener(SWT.MouseDown, new Listener() {
+		table.addListener(SWT.MouseDown, mouseListener());
+	}
+
+	private Listener mouseListener() {
+		return new Listener() {
 			public void handleEvent(Event event) {
 				Point pt = new Point(event.x, event.y);
 				TableItem clickedItem = table.getItem(pt);
@@ -70,7 +75,7 @@ public class BiomeView {
 				}
 			}
 
-		});
+		};
 	}
 
 	private int findClickedColumn(Point pt, TableItem clickedItem) {
@@ -96,6 +101,23 @@ public class BiomeView {
 		});
 	}
 
+	private void createTick5Button(Shell shell) {
+		Button tick5Button = new Button(shell, SWT.PUSH);
+		tick5Button.setText("5 Ticks");
+		tick5Button.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, true, 1, 1));
+		tick5Button.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					listener.tick5Clicked();
+				} catch (InterruptedException e1) {
+					System.out.print("Error: " + e1.getMessage());
+					e1.printStackTrace();
+				}
+			}
+		});
+	}
+	
 	public void setCellStatus(int x, int y, boolean alive) {
 		TableItem item = table.getItem(y);
 		if (alive) {
@@ -107,13 +129,12 @@ public class BiomeView {
 		}
 	}
 
-	public void update(Biome biome) {
+	public void update(boolean[][] biome) {
 		for (int y = 0; y < sizeY; y++) {
 			for (int x = 0; x < sizeX; x++) {
-				setCellStatus(x, y, biome.getStatus(x, y));
+				setCellStatus(x, y, biome[x][y]);
 			}
 		}
-
 		table.deselectAll();
 	}
 

@@ -3,19 +3,17 @@ package model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
+import static org.mockito.Mockito.*;
 
 public class BiomeTest {
+	private Biome biome;
 
 	@Mock
 	private IBiomeListener biomeListener;
-
-	private Biome biome;
 
 	@Before
 	public void setUp() {
