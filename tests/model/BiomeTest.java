@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -73,7 +74,7 @@ public class BiomeTest {
 		biome.setStatus(4, 3, true);
 
 		biome.tick();
-		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
 		assertTrue(biome.getStatus(4, 3));
 
 		runnableCaptor.getValue().run();
@@ -88,7 +89,7 @@ public class BiomeTest {
 		biome.setStatus(3, 3, true);
 
 		biome.tick();
-		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
 		assertFalse(biome.getStatus(4, 3));
 
 		runnableCaptor.getValue().run();
@@ -103,7 +104,7 @@ public class BiomeTest {
 		biome.setStatus(5, 7, true);
 
 		biome.tick();
-		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
 		assertTrue(biome.getStatus(5, 6));
 
 		runnableCaptor.getValue().run();
@@ -120,7 +121,7 @@ public class BiomeTest {
 		biome.setStatus(9, 9, true);
 
 		biome.tick();
-		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
 		assertTrue(biome.getStatus(9, 8));
 
 		runnableCaptor.getValue().run();
@@ -155,7 +156,7 @@ public class BiomeTest {
 		biome.setListener(biomeListener);
 
 		biome.tick();
-		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
 		verify(biomeListener, never()).biomeUpdated();
 
 		runnableCaptor.getValue().run();
@@ -163,4 +164,60 @@ public class BiomeTest {
 		verify(biomeListener).biomeUpdated();
 	}
 
+	@Test
+	public void testTick1CallsExecutorService1Time() throws Exception {
+		biome.setListener(biomeListener);
+
+		biome.tick(1);
+		verify(executorService, times(1)).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getValue().run();
+
+		verify(biomeListener).biomeUpdated();
+	}
+
+	@Test
+	public void testTick2CallsExecutorService2Times() throws Exception {
+		biome.setListener(biomeListener);
+
+		biome.tick(2);
+
+		verify(executorService, times(1)).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
+		verify(executorService, never()).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getValue().run();
+
+		verify(biomeListener, times(1)).biomeUpdated();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getValue().run();
+
+		verify(biomeListener, times(2)).biomeUpdated();
+		verify(executorService, times(1)).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+	}
+
+	@Test
+	public void testTick3CallsExecutorService3Times() throws Exception {
+		biome.setListener(biomeListener);
+
+		biome.tick(3);
+
+		verify(executorService, times(1)).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
+		verify(executorService, never()).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getValue().run();
+
+		verify(biomeListener, times(1)).biomeUpdated();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getAllValues().get(0).run();
+
+		verify(biomeListener, times(2)).biomeUpdated();
+		verify(executorService, times(2)).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getAllValues().get(0).run();
+
+		verify(biomeListener, times(3)).biomeUpdated();
+		verify(executorService, times(2)).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+	}
 }

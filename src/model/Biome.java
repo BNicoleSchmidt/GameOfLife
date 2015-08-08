@@ -24,7 +24,13 @@ public class Biome {
 	}
 
 	public void tick() {
+		tick(1);
+	}
+
+	public void tick(int timesToTick) {
 		Runnable runnable = new Runnable() {
+			int remainingTicks = timesToTick;
+
 			@Override
 			public void run() {
 				boolean[][] nextBiome = new boolean[sizeX][sizeY];
@@ -35,10 +41,15 @@ public class Biome {
 				}
 				biome = nextBiome;
 				notifyListener();
+
+				remainingTicks--;
+				if (remainingTicks > 0) {
+					executorService.schedule(this, 500, TimeUnit.MILLISECONDS);
+				}
 			}
 		};
 
-		executorService.schedule(runnable, 0, TimeUnit.SECONDS);
+		executorService.schedule(runnable, 0, TimeUnit.MILLISECONDS);
 	}
 
 	private boolean getNextState(int x, int y) {

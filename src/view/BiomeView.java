@@ -103,12 +103,7 @@ public class BiomeView {
 		tick5Button.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				try {
-					listener.tick5Clicked();
-				} catch (InterruptedException e1) {
-					System.out.print("Error: " + e1.getMessage());
-					e1.printStackTrace();
-				}
+				listener.tick5Clicked();
 			}
 		});
 	}

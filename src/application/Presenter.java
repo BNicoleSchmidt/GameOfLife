@@ -24,12 +24,8 @@ public class Presenter implements IBiomeListener {
 			}
 
 			@Override
-			public void tick5Clicked() throws InterruptedException {
-				for(int i=0; i<5; ++i) {
-					biome.tick();
-					biomeUpdated();
-					Thread.sleep(1000);
-				}
+			public void tick5Clicked() {
+				biome.tick(5);
 			}
 		});
 

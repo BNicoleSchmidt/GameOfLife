@@ -5,5 +5,5 @@ public interface IViewListener {
 
 	void tickClicked();
 
-	void tick5Clicked() throws InterruptedException;
+	void tick5Clicked();
 }

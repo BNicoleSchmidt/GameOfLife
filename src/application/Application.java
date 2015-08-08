@@ -16,7 +16,7 @@ public class Application {
 		final Biome biome = new Biome(WIDTH, HEIGHT);
 		Display display = new Display();
 		Shell shell = new Shell(display);
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		shell.setLayout(layout);
 		shell.setText("Conway's Game of Life");
 
