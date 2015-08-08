@@ -3,22 +3,34 @@ package model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.*;
-import static org.mockito.Mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class BiomeTest {
 	private Biome biome;
 
 	@Mock
 	private IBiomeListener biomeListener;
+	@Mock
+	private ScheduledExecutorService executorService;
+	@Captor
+	private ArgumentCaptor<Runnable> runnableCaptor;
 
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		biome = new Biome(10, 10);
+		biome = new Biome(10, 10, executorService);
 	}
 
 	@Test
@@ -59,7 +71,13 @@ public class BiomeTest {
 	@Test
 	public void testCellWithLessThanTwoNeighborsAliveDiesOnTick() {
 		biome.setStatus(4, 3, true);
+
 		biome.tick();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		assertTrue(biome.getStatus(4, 3));
+
+		runnableCaptor.getValue().run();
+
 		assertFalse(biome.getStatus(4, 3));
 	}
 
@@ -68,7 +86,13 @@ public class BiomeTest {
 		biome.setStatus(4, 4, true);
 		biome.setStatus(4, 2, true);
 		biome.setStatus(3, 3, true);
+
 		biome.tick();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		assertFalse(biome.getStatus(4, 3));
+
+		runnableCaptor.getValue().run();
+
 		assertTrue(biome.getStatus(4, 3));
 	}
 
@@ -77,7 +101,13 @@ public class BiomeTest {
 		biome.setStatus(5, 5, true);
 		biome.setStatus(5, 6, true);
 		biome.setStatus(5, 7, true);
+
 		biome.tick();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		assertTrue(biome.getStatus(5, 6));
+
+		runnableCaptor.getValue().run();
+
 		assertTrue(biome.getStatus(5, 6));
 	}
 
@@ -88,7 +118,13 @@ public class BiomeTest {
 		biome.setStatus(8, 7, true);
 		biome.setStatus(9, 8, true);
 		biome.setStatus(9, 9, true);
+
 		biome.tick();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		assertTrue(biome.getStatus(9, 8));
+
+		runnableCaptor.getValue().run();
+
 		assertFalse(biome.getStatus(9, 8));
 	}
 
@@ -119,7 +155,12 @@ public class BiomeTest {
 		biome.setListener(biomeListener);
 
 		biome.tick();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.SECONDS));
+		verify(biomeListener, never()).biomeUpdated();
+
+		runnableCaptor.getValue().run();
 
 		verify(biomeListener).biomeUpdated();
 	}
+
 }

@@ -31,17 +31,14 @@ public class BiomeView {
 		this.sizeY = sizeY;
 		this.red = shell.getDisplay().getSystemColor(SWT.COLOR_RED);
 		this.green = shell.getDisplay().getSystemColor(SWT.COLOR_GREEN);
-		
 
 		createTable(shell);
 		createTickButton(shell);
 		createTick5Button(shell);
 	}
 
-
 	private void createTable(Shell shell) {
-		table = new Table(shell, SWT.BORDER | SWT.NO_SCROLL
-				| SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
+		table = new Table(shell, SWT.BORDER | SWT.NO_SCROLL | SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
 		table.setLinesVisible(true);
 
 		for (int x = 0; x < sizeX; x++) {
@@ -66,8 +63,7 @@ public class BiomeView {
 				if (clickedItem != null) {
 					int x = findClickedColumn(pt, clickedItem);
 
-					int y = Arrays.asList(table.getItems())
-							.indexOf(clickedItem);
+					int y = Arrays.asList(table.getItems()).indexOf(clickedItem);
 
 					if (x != -1) {
 						listener.itemClicked(x, y);
@@ -91,8 +87,7 @@ public class BiomeView {
 	private void createTickButton(Shell shell) {
 		Button tickButton = new Button(shell, SWT.PUSH);
 		tickButton.setText("Tick");
-		tickButton.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, true,
-				1, 1));
+		tickButton.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, true, 1, 1));
 		tickButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -117,7 +112,7 @@ public class BiomeView {
 			}
 		});
 	}
-	
+
 	public void setCellStatus(int x, int y, boolean alive) {
 		TableItem item = table.getItem(y);
 		if (alive) {
@@ -130,12 +125,14 @@ public class BiomeView {
 	}
 
 	public void update(boolean[][] biome) {
-		for (int y = 0; y < sizeY; y++) {
-			for (int x = 0; x < sizeX; x++) {
-				setCellStatus(x, y, biome[x][y]);
+		new SWTThreadRunner().asyncExec(() -> {
+			for (int y = 0; y < sizeY; y++) {
+				for (int x = 0; x < sizeX; x++) {
+					setCellStatus(x, y, biome[x][y]);
+				}
 			}
-		}
-		table.deselectAll();
+			table.deselectAll();
+		});
 	}
 
 	public void setListener(IViewListener listener) {

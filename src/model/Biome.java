@@ -1,27 +1,44 @@
 package model;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 public class Biome {
 
 	private boolean[][] biome;
 	private int sizeX;
 	private int sizeY;
 	private IBiomeListener listener;
+	private ScheduledExecutorService executorService;
 
 	public Biome(int x, int y) {
+		this(x, y, Executors.newSingleThreadScheduledExecutor());
+	}
+
+	Biome(int x, int y, ScheduledExecutorService executorService) {
+		this.executorService = executorService;
 		biome = new boolean[x][y];
 		this.sizeX = x;
 		this.sizeY = y;
 	}
 
 	public void tick() {
-		boolean[][] nextBiome = new boolean[sizeX][sizeY];
-		for (int x = 0; x < this.sizeX; x++) {
-			for (int y = 0; y < this.sizeY; y++) {
-				nextBiome[x][y] = getNextState(x, y);
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				boolean[][] nextBiome = new boolean[sizeX][sizeY];
+				for (int x = 0; x < sizeX; x++) {
+					for (int y = 0; y < sizeY; y++) {
+						nextBiome[x][y] = getNextState(x, y);
+					}
+				}
+				biome = nextBiome;
+				notifyListener();
 			}
-		}
-		this.biome = nextBiome;
-		notifyListener();
+		};
+
+		executorService.schedule(runnable, 0, TimeUnit.SECONDS);
 	}
 
 	private boolean getNextState(int x, int y) {
@@ -37,7 +54,7 @@ public class Biome {
 		int alive = -checkNeighbor(x, y);
 		for (int xOffset = -1; xOffset <= 1; ++xOffset) {
 			for (int yOffset = -1; yOffset <= 1; ++yOffset) {
-				alive += checkNeighbor(x + xOffset, y + yOffset); 
+				alive += checkNeighbor(x + xOffset, y + yOffset);
 			}
 		}
 		return alive;
