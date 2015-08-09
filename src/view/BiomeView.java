@@ -2,11 +2,14 @@ package view;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 public class BiomeView {
@@ -15,12 +18,22 @@ public class BiomeView {
 	private int sizeX;
 	private int sizeY;
 	private Scene scene;
-	private VBox vBox;
+	private VBox grid;
+	private HBox buttons;
+	private VBox controlPanel;
 
 	public BiomeView(Stage primaryStage, int sizeX, int sizeY) {
 
 		SplitPane splitPane = new SplitPane();
-		this.vBox = new VBox();
+		this.grid = new VBox();
+		grid.setStyle("-fx-background-color: #000000;");
+		this.buttons = new HBox();
+		buttons.setAlignment(Pos.CENTER);
+		this.controlPanel = new VBox();
+		Text instructions = new Text("Click cells to toggle life!\nClick Tick buttons to progress!");
+		instructions.setTextAlignment(TextAlignment.CENTER);
+		controlPanel.setAlignment(Pos.CENTER);
+		controlPanel.getChildren().add(instructions);
 
 		this.sizeX = sizeX;
 		this.sizeY = sizeY;
@@ -28,10 +41,11 @@ public class BiomeView {
 		createGrid();
 		Button tickButton = createTickButton();
 		Button tick5Button = createTick5Button();
-		// hbox.getChildren().addAll(table);
-		splitPane.getItems().add(vBox);
-		splitPane.getItems().add(tickButton);
-		splitPane.getItems().add(tick5Button);
+		splitPane.getItems().add(grid);
+		buttons.getChildren().add(tickButton);
+		buttons.getChildren().add(tick5Button);
+		controlPanel.getChildren().add(buttons);
+		splitPane.getItems().add(controlPanel);
 		this.scene = new Scene(splitPane);
 
 		primaryStage.setTitle("Conway's Game of Life");
@@ -44,12 +58,14 @@ public class BiomeView {
 			HBox hbox = new HBox();
 			for (int x = 0; x < sizeX; x++) {
 				Button button = new Button("");
+				button.setMinSize(25, 25);
+				button.setMaxSize(25, 25);
 				button.setStyle("-fx-base: #f3622d;");
 				button.setId(x + "," + y);
 				button.setOnAction(mouseListener(x, y));
 				hbox.getChildren().add(button);
 			}
-			vBox.getChildren().add(hbox);
+			grid.getChildren().add(hbox);
 		}
 	}
 
@@ -57,7 +73,6 @@ public class BiomeView {
 		return new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Clicked : " + x + "," + y);
 				listener.itemClicked(x, y);
 			}
 		};
@@ -86,13 +101,8 @@ public class BiomeView {
 	}
 
 	public void setCellStatus(int x, int y, boolean alive) {
-		System.out.println("In setcellstatus");
 		String id = "#" + x + "," + y;
 		Button item = (Button) scene.lookup(id);
-		if (item == null) {
-			System.out.println("null");
-		}
-		System.out.println(alive);
 		if (alive) {
 			item.setStyle("-fx-base: #57b757;");
 		} else {
@@ -101,7 +111,6 @@ public class BiomeView {
 	}
 
 	public void update(boolean[][] biome) {
-		System.out.println("in update");
 		new JFXThreadRunner().runLater(() -> {
 			for (int y = 0; y < sizeY; y++) {
 				for (int x = 0; x < sizeX; x++) {
