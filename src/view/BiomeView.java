@@ -1,132 +1,113 @@
 package view;
 
-import java.util.Arrays;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.SplitPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class BiomeView {
 
-	private Table table;
-	private Color red;
-	private Color green;
 	private IViewListener listener;
 	private int sizeX;
 	private int sizeY;
+	private Scene scene;
+	private VBox vBox;
 
-	public BiomeView(Shell shell, int sizeX, int sizeY) {
+	public BiomeView(Stage primaryStage, int sizeX, int sizeY) {
+
+		SplitPane splitPane = new SplitPane();
+		this.vBox = new VBox();
+
 		this.sizeX = sizeX;
 		this.sizeY = sizeY;
-		this.red = shell.getDisplay().getSystemColor(SWT.COLOR_RED);
-		this.green = shell.getDisplay().getSystemColor(SWT.COLOR_GREEN);
 
-		createTable(shell);
-		createTickButton(shell);
-		createTick5Button(shell);
+		createGrid();
+		Button tickButton = createTickButton();
+		Button tick5Button = createTick5Button();
+		// hbox.getChildren().addAll(table);
+		splitPane.getItems().add(vBox);
+		splitPane.getItems().add(tickButton);
+		splitPane.getItems().add(tick5Button);
+		this.scene = new Scene(splitPane);
+
+		primaryStage.setTitle("Conway's Game of Life");
+		primaryStage.setScene(scene);
+		primaryStage.show();
 	}
 
-	private void createTable(Shell shell) {
-		table = new Table(shell, SWT.BORDER | SWT.NO_SCROLL | SWT.FULL_SELECTION | SWT.HIDE_SELECTION);
-		table.setLinesVisible(true);
-
-		for (int x = 0; x < sizeX; x++) {
-			new TableColumn(table, SWT.CENTER);
-		}
+	private void createGrid() {
 		for (int y = 0; y < sizeY; y++) {
-			new TableItem(table, SWT.CENTER);
+			HBox hbox = new HBox();
+			for (int x = 0; x < sizeX; x++) {
+				Button button = new Button("");
+				button.setStyle("-fx-base: #f3622d;");
+				button.setId(x + "," + y);
+				button.setOnAction(mouseListener(x, y));
+				hbox.getChildren().add(button);
+			}
+			vBox.getChildren().add(hbox);
 		}
-		for (int x = 0; x < sizeX; x++) {
-			table.getColumn(x).pack();
-		}
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-
-		table.addListener(SWT.MouseDown, mouseListener());
 	}
 
-	private Listener mouseListener() {
-		return new Listener() {
-			public void handleEvent(Event event) {
-				Point pt = new Point(event.x, event.y);
-				TableItem clickedItem = table.getItem(pt);
-				if (clickedItem != null) {
-					int x = findClickedColumn(pt, clickedItem);
-
-					int y = Arrays.asList(table.getItems()).indexOf(clickedItem);
-
-					if (x != -1) {
-						listener.itemClicked(x, y);
-					}
-				}
+	private EventHandler<ActionEvent> mouseListener(int x, int y) {
+		return new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				System.out.println("Clicked : " + x + "," + y);
+				listener.itemClicked(x, y);
 			}
-
 		};
 	}
 
-	private int findClickedColumn(Point pt, TableItem clickedItem) {
-		for (int i = 0; i < sizeX; i++) {
-			Rectangle rect = clickedItem.getBounds(i);
-			if (rect.contains(pt)) {
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	private void createTickButton(Shell shell) {
-		Button tickButton = new Button(shell, SWT.PUSH);
-		tickButton.setText("Tick");
-		tickButton.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, true, 1, 1));
-		tickButton.addSelectionListener(new SelectionAdapter() {
+	private Button createTickButton() {
+		Button tickButton = new Button("Tick");
+		tickButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void handle(ActionEvent e) {
 				listener.tickClicked();
 			}
 		});
+		return tickButton;
 	}
 
-	private void createTick5Button(Shell shell) {
-		Button tick5Button = new Button(shell, SWT.PUSH);
-		tick5Button.setText("5 Ticks");
-		tick5Button.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, true, 1, 1));
-		tick5Button.addSelectionListener(new SelectionAdapter() {
+	private Button createTick5Button() {
+		Button tick5Button = new Button("5 Ticks");
+		tick5Button.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-			public void widgetSelected(SelectionEvent e) {
+			public void handle(ActionEvent e) {
 				listener.tick5Clicked();
 			}
 		});
+		return tick5Button;
 	}
 
 	public void setCellStatus(int x, int y, boolean alive) {
-		TableItem item = table.getItem(y);
+		System.out.println("In setcellstatus");
+		String id = "#" + x + "," + y;
+		Button item = (Button) scene.lookup(id);
+		if (item == null) {
+			System.out.println("null");
+		}
+		System.out.println(alive);
 		if (alive) {
-			item.setText(x, "1");
-			item.setBackground(x, green);
+			item.setStyle("-fx-base: #57b757;");
 		} else {
-			item.setText(x, "0");
-			item.setBackground(x, red);
+			item.setStyle("-fx-base: #f3622d;");
 		}
 	}
 
 	public void update(boolean[][] biome) {
-		new SWTThreadRunner().asyncExec(() -> {
+		System.out.println("in update");
+		new JFXThreadRunner().runLater(() -> {
 			for (int y = 0; y < sizeY; y++) {
 				for (int x = 0; x < sizeX; x++) {
 					setCellStatus(x, y, biome[x][y]);
 				}
 			}
-			table.deselectAll();
 		});
 	}
 
