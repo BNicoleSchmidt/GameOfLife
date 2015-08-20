@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -30,7 +31,7 @@ public class BiomeView {
 		this.buttons = new HBox();
 		buttons.setAlignment(Pos.CENTER);
 		this.controlPanel = new VBox();
-		Text instructions = new Text("Click cells to toggle life!\nClick Tick buttons to progress!");
+		Text instructions = new Text("Click cells to toggle life!\nClick Tick buttons to progress!\n");
 		instructions.setTextAlignment(TextAlignment.CENTER);
 		controlPanel.setAlignment(Pos.CENTER);
 		controlPanel.getChildren().add(instructions);
@@ -39,12 +40,19 @@ public class BiomeView {
 		this.sizeY = sizeY;
 
 		createGrid();
+		splitPane.getItems().add(grid);
 		Button tickButton = createTickButton();
 		Button tick5Button = createTick5Button();
-		splitPane.getItems().add(grid);
 		buttons.getChildren().add(tickButton);
 		buttons.getChildren().add(tick5Button);
 		controlPanel.getChildren().add(buttons);
+		HBox tickForeverBox = new HBox();
+		tickForeverBox.setAlignment(Pos.CENTER);
+		Text forever = new Text("\nTick Forever: \n");
+		CheckBox tickForever = createTickForever();
+		tickForeverBox.getChildren().add(forever);
+		tickForeverBox.getChildren().add(tickForever);
+		controlPanel.getChildren().add(tickForeverBox);
 		splitPane.getItems().add(controlPanel);
 		this.scene = new Scene(splitPane);
 
@@ -60,7 +68,7 @@ public class BiomeView {
 				Button button = new Button("");
 				button.setMinSize(25, 25);
 				button.setMaxSize(25, 25);
-				button.setStyle("-fx-base: #f3622d;");
+				button.setStyle("-fx-base: #984f27;");
 				button.setId(x + "," + y);
 				button.setOnAction(mouseListener(x, y));
 				hbox.getChildren().add(button);
@@ -100,13 +108,28 @@ public class BiomeView {
 		return tick5Button;
 	}
 
+	private CheckBox createTickForever() {
+		CheckBox tickForever = new CheckBox();
+		tickForever.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				if (tickForever.isSelected()) {
+					listener.tickForever();
+				} else {
+					listener.stopTicking();
+				}
+			}
+		});
+		return tickForever;
+	}
+
 	public void setCellStatus(int x, int y, boolean alive) {
 		String id = "#" + x + "," + y;
 		Button item = (Button) scene.lookup(id);
 		if (alive) {
 			item.setStyle("-fx-base: #57b757;");
 		} else {
-			item.setStyle("-fx-base: #f3622d;");
+			item.setStyle("-fx-base: #984f27;");
 		}
 	}
 

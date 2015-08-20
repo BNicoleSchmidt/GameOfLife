@@ -110,4 +110,24 @@ public class PresenterTest {
 		verify(biome).tick(5);
 	}
 
+	@Test
+	public void testWhenTickForeverSelectedTickForeverIsSet() {
+		new Presenter(biome, biomeView);
+		verify(biomeView).setListener(viewListenerCaptor.capture());
+		IViewListener viewListener = viewListenerCaptor.getValue();
+
+		viewListener.tickForever();
+
+		verify(biome).setTickForever(true);
+	}
+
+	@Test
+	public void testWhenTickForeverUnselectedTickForeverIsUnset() {
+		new Presenter(biome, biomeView);
+		verify(biomeView).setListener(viewListenerCaptor.capture());
+		IViewListener viewListener = viewListenerCaptor.getValue();
+
+		viewListener.stopTicking();
+		verify(biome).setTickForever(false);
+	}
 }

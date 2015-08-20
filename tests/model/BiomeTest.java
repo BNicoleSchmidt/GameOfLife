@@ -220,4 +220,24 @@ public class BiomeTest {
 		verify(biomeListener, times(3)).biomeUpdated();
 		verify(executorService, times(2)).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
 	}
+
+	@Test
+	public void testWhenTickForeverIsSetBiomeContinuesTicking() {
+		biome.setListener(biomeListener);
+		biome.setTickForever(true);
+		verify(executorService, times(1)).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
+		runnableCaptor.getValue().run();
+
+		verify(biomeListener, times(1)).biomeUpdated();
+		verify(executorService).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getAllValues().get(0).run();
+
+		verify(biomeListener, times(2)).biomeUpdated();
+		verify(executorService, times(2)).schedule(runnableCaptor.capture(), eq(500L), eq(TimeUnit.MILLISECONDS));
+
+		runnableCaptor.getAllValues().get(0).run();
+
+		verify(biomeListener, times(3)).biomeUpdated();
+	}
 }

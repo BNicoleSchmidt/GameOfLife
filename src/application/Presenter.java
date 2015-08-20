@@ -27,6 +27,16 @@ public class Presenter implements IBiomeListener {
 			public void tick5Clicked() {
 				biome.tick(5);
 			}
+
+			@Override
+			public void tickForever() {
+				biome.setTickForever(true);
+			}
+
+			@Override
+			public void stopTicking() {
+				biome.setTickForever(false);
+			}
 		});
 
 		biome.setListener(this);

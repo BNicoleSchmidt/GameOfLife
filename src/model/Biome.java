@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Biome {
 
+	private boolean tickForever = false;
 	private boolean[][] biome;
 	private int sizeX;
 	private int sizeY;
@@ -43,7 +44,7 @@ public class Biome {
 				notifyListener();
 
 				remainingTicks--;
-				if (remainingTicks > 0) {
+				if (remainingTicks > 0 || tickForever) {
 					executorService.schedule(this, 500, TimeUnit.MILLISECONDS);
 				}
 			}
@@ -95,6 +96,17 @@ public class Biome {
 
 	protected void setStatus(int x, int y, boolean status) {
 		this.biome[x][y] = status;
+	}
+
+	public void setTickForever(boolean bool) {
+		this.tickForever = bool;
+		if (bool) {
+			tick(1);
+		}
+	}
+
+	public boolean getTickForever() {
+		return tickForever;
 	}
 
 	public void toggleCell(int x, int y) {

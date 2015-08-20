@@ -6,4 +6,8 @@ public interface IViewListener {
 	void tickClicked();
 
 	void tick5Clicked();
+
+	void tickForever();
+
+	void stopTicking();
 }
