@@ -240,4 +240,13 @@ public class BiomeTest {
 
 		verify(biomeListener, times(3)).biomeUpdated();
 	}
+
+	@Test
+	public void testWhenTickForeverIsTrueThenTickButtonsDoNothing() {
+		biome.setListener(biomeListener);
+		biome.tickForever = true;
+
+		biome.tick(1);
+		verify(executorService, never()).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
+	}
 }

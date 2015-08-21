@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Biome {
 
-	private boolean tickForever = false;
+	boolean tickForever = false;
 	private boolean[][] biome;
 	private int sizeX;
 	private int sizeY;
@@ -29,28 +29,30 @@ public class Biome {
 	}
 
 	public void tick(int timesToTick) {
-		Runnable runnable = new Runnable() {
-			int remainingTicks = timesToTick;
+		if ((timesToTick > 0 || tickForever) && !(timesToTick > 0 && tickForever)) {
+			Runnable runnable = new Runnable() {
+				int remainingTicks = timesToTick;
 
-			@Override
-			public void run() {
-				boolean[][] nextBiome = new boolean[sizeX][sizeY];
-				for (int x = 0; x < sizeX; x++) {
-					for (int y = 0; y < sizeY; y++) {
-						nextBiome[x][y] = getNextState(x, y);
+				@Override
+				public void run() {
+					boolean[][] nextBiome = new boolean[sizeX][sizeY];
+					for (int x = 0; x < sizeX; x++) {
+						for (int y = 0; y < sizeY; y++) {
+							nextBiome[x][y] = getNextState(x, y);
+						}
+					}
+					biome = nextBiome;
+					notifyListener();
+
+					remainingTicks--;
+					if (remainingTicks > 0 || tickForever) {
+						executorService.schedule(this, 500, TimeUnit.MILLISECONDS);
 					}
 				}
-				biome = nextBiome;
-				notifyListener();
+			};
 
-				remainingTicks--;
-				if (remainingTicks > 0 || tickForever) {
-					executorService.schedule(this, 500, TimeUnit.MILLISECONDS);
-				}
-			}
-		};
-
-		executorService.schedule(runnable, 0, TimeUnit.MILLISECONDS);
+			executorService.schedule(runnable, 0, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	private boolean getNextState(int x, int y) {
@@ -101,7 +103,7 @@ public class Biome {
 	public void setTickForever(boolean bool) {
 		this.tickForever = bool;
 		if (bool) {
-			tick(1);
+			tick(0);
 		}
 	}
 
