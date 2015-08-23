@@ -45,7 +45,7 @@ public class Biome {
 					notifyListener();
 
 					remainingTicks--;
-					if (remainingTicks > 0 || tickForever) {
+					if ((remainingTicks > 0 || tickForever) && !(remainingTicks > 0 && tickForever)) {
 						executorService.schedule(this, 500, TimeUnit.MILLISECONDS);
 					}
 				}
