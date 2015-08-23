@@ -37,6 +37,11 @@ public class Presenter implements IBiomeListener {
 			public void stopTicking() {
 				biome.setTickForever(false);
 			}
+
+			@Override
+			public void randomize() {
+				biome.randomize();
+			}
 		});
 
 		biome.setListener(this);

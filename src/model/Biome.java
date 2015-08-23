@@ -130,4 +130,17 @@ public class Biome {
 		return this.biome;
 	}
 
+	public void randomize() {
+		for (int x = 0; x < sizeX; x++) {
+			for (int y = 0; y < sizeY; y++) {
+				if (Math.random() > .5) {
+					biome[x][y] = true;
+				} else {
+					biome[x][y] = false;
+				}
+			}
+		}
+		notifyListener();
+	}
+
 }

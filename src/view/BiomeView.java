@@ -20,16 +20,16 @@ public class BiomeView {
 	private int sizeY;
 	private Scene scene;
 	private VBox grid;
-	private HBox buttons;
 	private VBox controlPanel;
 
 	public BiomeView(Stage primaryStage, int sizeX, int sizeY) {
 
+		HBox tickButtons;
 		SplitPane splitPane = new SplitPane();
 		this.grid = new VBox();
 		grid.setStyle("-fx-background-color: #000000;");
-		this.buttons = new HBox();
-		buttons.setAlignment(Pos.CENTER);
+		tickButtons = new HBox();
+		tickButtons.setAlignment(Pos.CENTER);
 		this.controlPanel = new VBox();
 		Text instructions = new Text("Click cells to toggle life!\nClick Tick buttons to progress!\n");
 		instructions.setTextAlignment(TextAlignment.CENTER);
@@ -43,9 +43,10 @@ public class BiomeView {
 		splitPane.getItems().add(grid);
 		Button tickButton = createTickButton();
 		Button tick5Button = createTick5Button();
-		buttons.getChildren().add(tickButton);
-		buttons.getChildren().add(tick5Button);
-		controlPanel.getChildren().add(buttons);
+		tickButtons.getChildren().add(tickButton);
+		tickButtons.getChildren().add(tick5Button);
+		controlPanel.getChildren().add(tickButtons);
+		Button randomize = createRandomButton();
 		HBox tickForeverBox = new HBox();
 		tickForeverBox.setAlignment(Pos.CENTER);
 		Text forever = new Text("\nTick Forever: \n");
@@ -53,6 +54,7 @@ public class BiomeView {
 		tickForeverBox.getChildren().add(forever);
 		tickForeverBox.getChildren().add(tickForever);
 		controlPanel.getChildren().add(tickForeverBox);
+		controlPanel.getChildren().add(randomize);
 		splitPane.getItems().add(controlPanel);
 		this.scene = new Scene(splitPane);
 
@@ -121,6 +123,17 @@ public class BiomeView {
 			}
 		});
 		return tickForever;
+	}
+
+	private Button createRandomButton() {
+		Button random = new Button("Randomize Life");
+		random.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				listener.randomize();
+			}
+		});
+		return random;
 	}
 
 	public void setCellStatus(int x, int y, boolean alive) {

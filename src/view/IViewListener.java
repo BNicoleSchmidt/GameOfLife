@@ -10,4 +10,6 @@ public interface IViewListener {
 	void tickForever();
 
 	void stopTicking();
+
+	void randomize();
 }
