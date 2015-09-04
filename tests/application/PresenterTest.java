@@ -130,4 +130,25 @@ public class PresenterTest {
 		viewListener.stopTicking();
 		verify(biome).setTickForever(false);
 	}
+
+	@Test
+	public void testWhenClearClickedBiomeClears() {
+		new Presenter(biome, biomeView);
+		verify(biomeView).setListener(viewListenerCaptor.capture());
+		IViewListener viewListener = viewListenerCaptor.getValue();
+
+		viewListener.clear();
+		verify(biome).clear();
+	}
+
+	@Test
+	public void testWhenClearClickedTickForeverStops() {
+		new Presenter(biome, biomeView);
+		verify(biomeView).setListener(viewListenerCaptor.capture());
+		IViewListener viewListener = viewListenerCaptor.getValue();
+
+		viewListener.clear();
+		verify(biome).setTickForever(false);
+		verify(biomeView).setTickForever(false);
+	}
 }

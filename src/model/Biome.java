@@ -143,4 +143,13 @@ public class Biome {
 		notifyListener();
 	}
 
+	public void clear() {
+		for (int x = 0; x < sizeX; x++) {
+			for (int y = 0; y < sizeY; y++) {
+				biome[x][y] = false;
+			}
+		}
+		notifyListener();
+	}
+
 }

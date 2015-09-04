@@ -21,6 +21,7 @@ public class BiomeView {
 	private Scene scene;
 	private VBox grid;
 	private VBox controlPanel;
+	private CheckBox tickForever;
 
 	public BiomeView(Stage primaryStage, int sizeX, int sizeY) {
 
@@ -47,14 +48,16 @@ public class BiomeView {
 		tickButtons.getChildren().add(tick5Button);
 		controlPanel.getChildren().add(tickButtons);
 		Button randomize = createRandomButton();
+		Button clear = createClearButton();
 		HBox tickForeverBox = new HBox();
 		tickForeverBox.setAlignment(Pos.CENTER);
 		Text forever = new Text("\nTick Forever: \n");
-		CheckBox tickForever = createTickForever();
+		this.tickForever = createTickForever();
 		tickForeverBox.getChildren().add(forever);
 		tickForeverBox.getChildren().add(tickForever);
 		controlPanel.getChildren().add(tickForeverBox);
 		controlPanel.getChildren().add(randomize);
+		controlPanel.getChildren().add(clear);
 		splitPane.getItems().add(controlPanel);
 		this.scene = new Scene(splitPane);
 
@@ -136,6 +139,17 @@ public class BiomeView {
 		return random;
 	}
 
+	private Button createClearButton() {
+		Button clear = new Button("Clear");
+		clear.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent e) {
+				listener.clear();
+			}
+		});
+		return clear;
+	}
+
 	public void setCellStatus(int x, int y, boolean alive) {
 		String id = "#" + x + "," + y;
 		Button item = (Button) scene.lookup(id);
@@ -158,6 +172,10 @@ public class BiomeView {
 
 	public void setListener(IViewListener listener) {
 		this.listener = listener;
+	}
+
+	public void setTickForever(boolean b) {
+		this.tickForever.setSelected(b);
 	}
 
 }

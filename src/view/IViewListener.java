@@ -12,4 +12,6 @@ public interface IViewListener {
 	void stopTicking();
 
 	void randomize();
+
+	void clear();
 }

@@ -20,6 +20,8 @@ import org.mockito.MockitoAnnotations;
 
 public class BiomeTest {
 	private Biome biome;
+	private int sizeX = 10;
+	private int sizeY = 10;
 
 	@Mock
 	private IBiomeListener biomeListener;
@@ -31,22 +33,26 @@ public class BiomeTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		biome = new Biome(10, 10, executorService);
+		biome = new Biome(sizeX, sizeY, executorService);
 	}
 
 	@Test
 	public void testBiomeSizeXIsCorrect() {
-		assertEquals(10, biome.getSizeX());
+		assertEquals(sizeX, biome.getSizeX());
 	}
 
 	@Test
 	public void testBiomeSizeYIsCorrect() {
-		assertEquals(10, biome.getSizeY());
+		assertEquals(sizeY, biome.getSizeY());
 	}
 
 	@Test
 	public void testBiomeContentsBeginDead() {
-		assertFalse(biome.getStatus(5, 5));
+		for (int x = 0; x < sizeX; x++) {
+			for (int y = 0; y < sizeY; y++) {
+				assertFalse(biome.getStatus(x, y));
+			}
+		}
 	}
 
 	@Test
@@ -243,10 +249,28 @@ public class BiomeTest {
 
 	@Test
 	public void testWhenTickForeverIsTrueThenTickButtonsDoNothing() {
-		biome.setListener(biomeListener);
 		biome.tickForever = true;
 
 		biome.tick(1);
 		verify(executorService, never()).schedule(runnableCaptor.capture(), eq(0L), eq(TimeUnit.MILLISECONDS));
+	}
+
+	@Test
+	public void testWhenClearCalledBiomeIsDead() {
+		biome.setStatus(5, 3, true);
+		biome.setStatus(8, 1, true);
+		biome.clear();
+		for (int x = 0; x < sizeX; x++) {
+			for (int y = 0; y < sizeY; y++) {
+				assertFalse(biome.getStatus(x, y));
+			}
+		}
+	}
+
+	@Test
+	public void testWhenClearCalledListenerIsNotified() {
+		biome.setListener(biomeListener);
+		biome.clear();
+		verify(biomeListener).biomeUpdated();
 	}
 }

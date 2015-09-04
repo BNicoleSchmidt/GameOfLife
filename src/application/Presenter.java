@@ -42,6 +42,13 @@ public class Presenter implements IBiomeListener {
 			public void randomize() {
 				biome.randomize();
 			}
+
+			@Override
+			public void clear() {
+				biome.setTickForever(false);
+				biomeView.setTickForever(false);
+				biome.clear();
+			}
 		});
 
 		biome.setListener(this);
