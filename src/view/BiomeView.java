@@ -88,23 +88,13 @@ public class BiomeView {
 
 	private Button createTickButton() {
 		Button tickButton = new Button("Tick");
-		tickButton.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				listener.tickClicked();
-			}
-		});
+		tickButton.setOnAction(event -> listener.tickClicked());
 		return tickButton;
 	}
 
 	private Button createTick5Button() {
 		Button tick5Button = new Button("5 Ticks");
-		tick5Button.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				listener.tick5Clicked();
-			}
-		});
+		tick5Button.setOnAction(event -> listener.tick5Clicked());
 		return tick5Button;
 	}
 
