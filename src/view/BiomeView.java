@@ -83,12 +83,7 @@ public class BiomeView {
 	}
 
 	private EventHandler<ActionEvent> mouseListener(int x, int y) {
-		return new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				listener.itemClicked(x, y);
-			}
-		};
+		return event -> listener.itemClicked(x, y);
 	}
 
 	private Button createTickButton() {
@@ -115,14 +110,11 @@ public class BiomeView {
 
 	private CheckBox createTickForever() {
 		CheckBox tickForever = new CheckBox();
-		tickForever.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				if (tickForever.isSelected()) {
-					listener.tickForever();
-				} else {
-					listener.stopTicking();
-				}
+		tickForever.setOnAction(event -> {
+			if (tickForever.isSelected()) {
+				listener.tickForever();
+			} else {
+				listener.stopTicking();
 			}
 		});
 		return tickForever;
@@ -130,23 +122,13 @@ public class BiomeView {
 
 	private Button createRandomButton() {
 		Button random = new Button("Randomize Life");
-		random.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				listener.randomize();
-			}
-		});
+		random.setOnAction(event -> listener.randomize());
 		return random;
 	}
 
 	private Button createClearButton() {
 		Button clear = new Button("Clear");
-		clear.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				listener.clear();
-			}
-		});
+		clear.setOnAction(event -> listener.clear());
 		return clear;
 	}
 
